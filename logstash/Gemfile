@@ -1,0 +1,7 @@
+source "https://rubygems.org"
+
+gem "clamp"
+gem "cabin"
+gem "octokit"
+gem "mustache"
+gem "stud"
