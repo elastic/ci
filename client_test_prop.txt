@@ -1,0 +1,8 @@
+# the directory to unzip elasticsearch binary
+RELEASE_DIR=es/target/releases
+# curl --max-time when fetching elasticsearch zip
+CURL_MAX_TIME=300
+# curl --retry when fetching elasticserach zip
+CURL_RETRY=3
+# sleep time in seconds after starting elasticsearch
+ES_WAIT_TIME=40

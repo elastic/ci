@@ -1,0 +1,25 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                              http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <profiles>
+    <profile>
+      <id>random_test_properties</id>
+      <properties>
+        <es.action.wait_on_mapping_change>true</es.action.wait_on_mapping_change>
+        <es.logger.level>DEBUG</es.logger.level>
+        <tests.heap.size>${env.tests.heap.size}</tests.heap.size>
+        <tests.heapdump.path>${env.WORKSPACE}</tests.heapdump.path>
+        <tests.network>true</tests.network>
+        <tests.rest.blacklist>cat.recovery/10_basic/*</tests.rest.blacklist>
+        <tests.slow>true</tests.slow>
+        <tests.timeoutSuite>500000</tests.timeoutSuite>
+      </properties>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>default</activeProfile>
+    <activeProfile>random_test_properties</activeProfile>
+  </activeProfiles>
+</settings>

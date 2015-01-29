@@ -1,0 +1,24 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                              http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <profiles>
+    <profile>
+      <id>rest_tests_properties</id>
+      <properties>
+        <es.node.mode>local</es.node.mode>
+        <tests.class>org.elasticsearch.test.rest.ElasticsearchRestTests</tests.class>
+        <tests.compatibility>${env.COMPAT}</tests.compatibility>
+        <tests.jvms>1</tests.jvms>
+        <tests.rest.blacklist>${env.BLACKLIST}</tests.rest.blacklist>
+        <tests.rest.spec>${env.WORKSPACE}/es-old/rest-api-spec/api</tests.rest.spec>
+        <tests.rest.suite>${env.WORKSPACE}/es-old/rest-api-spec/test</tests.rest.suite>
+      </properties>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>default</activeProfile>
+    <activeProfile>rest_tests_properties</activeProfile>
+  </activeProfiles>
+</settings>

@@ -1,0 +1,23 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                              http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <profiles>
+    <profile>
+      <id>bwc_tests_properties</id>
+      <properties>
+        <es.logger.level>DEBUG</es.logger.level>
+        <es.node.mode>network</es.node.mode>
+        <tests.bwc.path>${env.WORKSPACE}/backwards</tests.bwc.path>
+        <tests.bwc.version>${env.ES_V}</tests.bwc.version>
+        <tests.filter>@backwards</tests.filter>
+        <tests.bwc>true</tests.bwc>
+      </properties>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>default</activeProfile>
+    <activeProfile>bwc_tests_properties</activeProfile>
+  </activeProfiles>
+</settings>

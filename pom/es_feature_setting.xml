@@ -1,0 +1,26 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                              http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <localRepository>${env.WORKSPACE}/.m2/repository</localRepository>
+  <profiles>
+    <profile>
+      <id>feature_testproperties</id>
+      <properties>
+        <es.action.wait_on_mapping_change>true</es.action.wait_on_mapping_change>
+        <es.logger.level>DEBUG</es.logger.level>
+        <es.node.local>false</es.node.local>
+        <tests.heap.size>${env.tests.heap.size}</tests.heap.size>
+        <tests.network>true</tests.network>
+        <tests.rest.blacklist>cat.recovery/10_basic/*</tests.rest.blacklist>
+        <tests.slow>true</tests.slow>
+        <validate.skip>true</validate.skip>
+      </properties>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>default</activeProfile>
+    <activeProfile>feature_testproperties</activeProfile>
+  </activeProfiles>
+</settings>
