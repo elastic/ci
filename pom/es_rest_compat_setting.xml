@@ -14,6 +14,7 @@
         <tests.rest.blacklist>${env.BLACKLIST}</tests.rest.blacklist>
         <tests.rest.spec>${env.WORKSPACE}/es-old/rest-api-spec/api</tests.rest.spec>
         <tests.rest.suite>${env.WORKSPACE}/es-old/rest-api-spec/test</tests.rest.suite>
+        <tests.rest.validate_spec>${env.VALIDATE_SPEC}</tests.rest.validate_spec>
       </properties>
     </profile>
   </profiles>
