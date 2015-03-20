@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><project>
   <actions/>
   <description/>
+  <!-- TODO(sissel): Capitalize the names -->
   <displayName>{{ job_name }}</displayName>
   <logRotator class="hudson.tasks.LogRotator">
     <daysToKeep>-1</daysToKeep>
@@ -13,7 +14,7 @@
     <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.9.1">
       <projectUrl>{{ project_url }}</projectUrl>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
-    <jenkins.plugins.hipchat.HipChatNotifier_-HipChatJobProperty plugin="hipchat@0.1.6">
+    <jenkins.plugins.hipchat.HipChatNotifier_-HipChatJobProperty plugin="hipchat@0.1.8">
       <room/>
       <startNotification>false</startNotification>
       <notifySuccess>false</notifySuccess>
@@ -23,13 +24,13 @@
       <notifyFailure>false</notifyFailure>
       <notifyBackToNormal>false</notifyBackToNormal>
     </jenkins.plugins.hipchat.HipChatNotifier_-HipChatJobProperty>
-    <jenkins.advancedqueue.AdvancedQueueSorterJobProperty plugin="PrioritySorter@2.8">
+    <jenkins.advancedqueue.AdvancedQueueSorterJobProperty plugin="PrioritySorter@2.9">
       <useJobPriority>false</useJobPriority>
       <priority>-1</priority>
     </jenkins.advancedqueue.AdvancedQueueSorterJobProperty>
-    <hudson.plugins.disk__usage.DiskUsageProperty plugin="disk-usage@0.23"/>
+    <hudson.plugins.disk__usage.DiskUsageProperty plugin="disk-usage@0.24"/>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.2.2">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.3">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -47,11 +48,12 @@
     <extensions>
       <hudson.plugins.git.extensions.impl.WipeWorkspace/>
       <hudson.plugins.git.extensions.impl.RelativeTargetDirectory>
-        <relativeTargetDir>{{ relative_target_dir }}</relativeTargetDir>
+        <relativeTargetDir>{{ repo_name }}</relativeTargetDir>
       </hudson.plugins.git.extensions.impl.RelativeTargetDirectory>
     </extensions>
   </scm>
-  <canRoam>true</canRoam>
+  <assignedNode>metal-pool</assignedNode>
+  <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
@@ -60,6 +62,7 @@
     <com.cloudbees.jenkins.GitHubPushTrigger plugin="github@1.9.1">
       <spec/>
     </com.cloudbees.jenkins.GitHubPushTrigger>
+    <hudson.triggers.TimerTrigger><spec>H/6 * * * *</spec></hudson.triggers.TimerTrigger>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
   <builders>
@@ -86,7 +89,7 @@ source /mnt/jenkins/rbenv/bash_profile
 rbenv shell jruby-1.7.16
 ruby -v
 
-cd {{ relative_target_dir }}
+cd {{ repo_name }}
 
 bundle install
 bundle exec rake vendor
@@ -96,6 +99,15 @@ bundle exec rspec
       <runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$Fail" plugin="run-condition@1.0"/>
     </org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder>
   </builders>
-  <publishers/>
+  <publishers>
+    <jenkins.plugins.logstash.LogstashNotifier plugin="logstash@1.0.3">
+      <maxLines>1000</maxLines>
+      <failBuild>false</failBuild>
+    </jenkins.plugins.logstash.LogstashNotifier>
+  <hudson.tasks.Mailer>
+  <recipients>logstash-build@elasticsearch.com</recipients>
+  <dontNotifyEveryUnstableBuild/>
+  <sendToIndividuals/>
+</hudson.tasks.Mailer></publishers>
   <buildWrappers/>
 </project>

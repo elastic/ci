@@ -1,5 +1,6 @@
 require "mustache"
 
+# :nodoc:
 class LogstashPluginJenkinsJob
   attr_accessor :plugin_name
   attr_accessor :plugin_type
@@ -26,8 +27,16 @@ class LogstashPluginJenkinsJob
     "#{project_url}.git"
   end
 
+  def job_dir
+    File.join("jobs", "logstash_plugin_#{plugin_type.downcase}_#{plugin_name.downcase}")
+  end
+  
+  def config_xml_path
+    File.join(job_dir, "config.xml")
+  end
 end
 
+# :nodoc:
 class JobRenderer
   def self.template_path
     File.join(File.dirname(__FILE__), "..", "templates/config.xml")
@@ -38,5 +47,3 @@ class JobRenderer
     Mustache.render(template, job)
   end
 end
-
-
