@@ -1,0 +1,16 @@
+# This file is used for randomization in CI. It provides a set of profiles that will be used to test against
+# The profiles specify a elasticsearch version and the corresponding lucene version to use for the tests
+randomization:
+  elasticsearch:
+    es150:
+      version: 1.5.0
+      branch: tags/v1.5.0
+      lucene.version: 4.10.4
+    es151:
+      version: 1.5.1-SNAPSHOT
+      branch: origin/1.5
+      lucene.version: 4.10.4
+    es160:
+      version: 1.6.0-SNAPSHOT
+      branch: origin/1.x
+      lucene.version: 4.10.4

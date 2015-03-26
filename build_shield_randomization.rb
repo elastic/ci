@@ -70,6 +70,10 @@ C = {:local => false, :test => false}
 OptionParser.new do |opts|
   opts.banner = "Usage: build_ranodimzatin.rb [options]"
 
+  opts.on("-cCONFIG", "--config==CONFIG", "Configuration") do |d|
+    C[:configuration] = d
+  end
+
   opts.on("-d", "--debug", "Debug mode") do |d|
     L.level = DEBUG
   end
@@ -240,32 +244,44 @@ class RandomizedRunner
     @p_writer = mwriter
   end
 
-  def es_git_choice(es_version)
-    if es_version.first.end_with? "SNAPSHOT"
-       branch = 'origin'
-       if es_version.first.start_with? '1.4'
-         version = '1.4'
-       else
-         version = '1.x'
-       end
+  def es_git_choice(es_version, ext_config = nil)
+    return [] if es_version.nil?
+    this_version = es_version.first
+    if(ext_config.nil? || ext_config[this_version].nil?)
+      if this_version.end_with? "SNAPSHOT"
+        branch = 'origin'
+        if this_version.start_with? '1.4'
+          version = '1.4'
+        else
+          version = '1.x'
+        end
+      else
+        branch = 'tags'
+        version = "v%s" % this_version
+      end
+      [branch + '/' + version]
     else
-       branch = 'tags'
-       version = "v%s" % es_version
-    end
-    [branch + '/' + version]
-  end
-
-  def lucene_choice(es_version)
-    if(es_version.first == '1.4.2')
-      ['4.10.2']
-    elsif(es_version.first == '1.4.4')
-      ['4.10.3']
-    else
-      ['4.10.4']
+      [ext_config[this_version]['branch']]
     end
   end
 
-  def generate_selections
+  def lucene_choice(es_version, ext_config = nil)
+    return [] if es_version.nil?
+    this_version = es_version.first
+    if(ext_config.nil? || ext_config[this_version].nil?)
+      if(this_version == '1.4.2')
+        ['4.10.2']
+      elsif(this_version == '1.4.4')
+        ['4.10.3']
+      else
+        ['4.10.4']
+      end
+    else
+      [ext_config[this_version]['lucene.version']]
+    end
+  end
+
+  def generate_selections(ext_config = nil)
     configuration = random_choices
 
     L.debug "Enter %s" % __method__
@@ -296,8 +312,8 @@ class RandomizedRunner
       end
       generated[k] = selections unless (selections.nil? || selections.size == 0)
     end
-    generated['lucene.version'] = lucene_choice(generated['elasticsearch.version'])
-    generated['es_git_branch'] = es_git_choice(generated['elasticsearch.version'])
+    generated['lucene.version'] = lucene_choice(generated['elasticsearch.version'], ext_config)
+    generated['es_git_branch'] = es_git_choice(generated['elasticsearch.version'], ext_config)
 
     L.debug "Generated selections %s" % YAML.dump(generated)
     generated
@@ -332,17 +348,47 @@ class RandomizedRunner
     result
   end
 
-  def run!
-    p_writer.generate_property_file(get_env_matrix(jdk, generate_selections))
+  def run!(ext_config = nil)
+    p_writer.generate_property_file(get_env_matrix(jdk, generate_selections(ext_config)))
   end
 
+end
+
+def configuration_transformation(configuration)
+  new_config = {}
+
+  configuration['randomization']['elasticsearch'].each do |k, v|
+    new_config[v['version']] =v.tap {|h| h.delete('version') }
+  end
+
+  new_config
+end
+
+def merge_configuration(configuration, selection_matrix) #TODO refactor to remove side effect
+  #Update es matrix base on supplied external configuration
+  if(configuration.keys.size > 0)
+    selection_matrix['elasticsearch.version'].first[:choices] = configuration.keys
+  end
+  selection_matrix.rehash
 end
 
 
 #
 # Main
 #
+#puts YAML.dump(C)
+#exit
 unless(C[:test])
+  # Load configuraiton if neede
+  ext_config = nil
+  if(C[:configuration])
+    if(File.exist?(C[:configuration]))
+      ext_config =  configuration_transformation(YAML.load_file(C[:configuration]))
+      merge_configuration(ext_config, RANDOM_CHOICES)
+    else
+      L.warn("Configuration file %s not found" % C[:configuration])
+    end
+  end
 
   # Check to see if this is running locally
   unless(C[:local])
@@ -381,16 +427,16 @@ unless(C[:test])
   runner = RandomizedRunner.new(RANDOM_CHOICES,
                                jdk.get_jdk.select_one,
                                PropertyWriter.new(working_directory))
-  environment_matrix = runner.run!
+  environment_matrix = runner.run!(ext_config)
   exit 0
 else
-  require "test/unit"
+  require "minitest/autorun"
 end
 
 #
 # Test
 #
-class TestJDKSelector < Test::Unit::TestCase
+class TestJDKSelector < Minitest::Test
   L = Logger.new 'test'
   L.outputters = Outputter.stdout
   L.level = DEBUG
@@ -404,7 +450,7 @@ class TestJDKSelector < Test::Unit::TestCase
   end
 end
 
-class TestFixJDKSelector < Test::Unit::TestCase
+class TestFixJDKSelector < Minitest::Test
   L = Logger.new 'test'
   L.outputters = Outputter.stdout
   L.level = DEBUG
@@ -432,7 +478,7 @@ class TestFixJDKSelector < Test::Unit::TestCase
   end
 end
 
-class TestPropertyWriter < Test::Unit::TestCase
+class TestPropertyWriter < Minitest::Test
   L = Logger.new 'test'
   L.outputters = Outputter.stdout
   L.level = DEBUG
@@ -470,7 +516,7 @@ class DummyPropertyWriter < PropertyWriter
   end
 end
 
-class TestRandomizedRunner < Test::Unit::TestCase
+class TestRandomizedRunner < Minitest::Test
 
   def test_initialize
     test_object = RandomizedRunner.new(RANDOM_CHOICES, '/tmp/dummy/jdk', po = PropertyWriter.new('/tmp'))
@@ -501,4 +547,58 @@ class TestRandomizedRunner < Test::Unit::TestCase
     assert_equal '/tmp/dummy/jdk', env_matrix[:JAVA_HOME]
   end
 
+  def test_configuration_transformation
+    current_directory =  File.dirname(File.expand_path(__FILE__))
+    test_config = YAML.load_file(File.join(current_directory, 'test', 'shield_randomization_yaml'))
+    test_config = configuration_transformation(test_config)
+    assert test_config['1.5.0']['branch'] == 'tags/v1.5.0', 'can not find tag'
+  end
+
+  def test_merge_configuration
+    #load test artifact
+    #thing = YAML.load_file('test/shield_randomization_yaml')
+    current_directory =  File.dirname(File.expand_path(__FILE__))
+    test_config = YAML.load_file(File.join(current_directory, 'test', 'shield_randomization_yaml'))
+    random_choices = {
+      'tests.jvm.argline' => [
+                              {:choices => ['-server'], :method => 'get_random_one'},
+                              {:choices => ['-XX:+UseConcMarkSweepGC', '-XX:+UseParallelGC', '-XX:+UseSerialGC', '-XX:+UseG1GC'], :method => 'get_random_one'},
+                             ],
+
+      # bug forced to be false for now :test_nightly => { :method => :true_or_false},
+      'elasticsearch.version' => [
+                                  #                              {:choices => ['1.4.2', '1.4.4', '1.4.5-SNAPSHOT', '1.5.0-SNAPSHOT'], :method => 'get_random_one'} disable 1.5.0 snapshot for now
+                                  {:choices => ['1.4.2', '1.4.4', '1.4.5-SNAPSHOT'], :method => 'get_random_one'}
+                                 ],
+    }
+    test_config = configuration_transformation(test_config)
+
+    merge_configuration(test_config, random_choices)
+    assert random_choices['elasticsearch.version'].first[:choices].include?('1.5.0'), 'configuration parameter not loaded'
+  end
+
+  def test_lucene_choices
+    test_object = RandomizedRunner.new(RANDOM_CHOICES, '/tmp/dummy/jdk', po = PropertyWriter.new('/tmp'))
+    assert_equal test_object.lucene_choice(['1.4.2']).first, '4.10.2'
+    current_directory =  File.dirname(File.expand_path(__FILE__))
+    test_config = YAML.load_file(File.join(current_directory, 'test', 'shield_randomization_yaml'))
+    test_config = configuration_transformation(test_config)
+    assert_equal  ['4.10.4'], test_object.lucene_choice(['1.5.0'], test_config)
+    assert_equal  ['4.10.2'], test_object.lucene_choice(['1.4.2'], test_config)
+    assert_equal  ['4.10.2'], test_object.lucene_choice(['1.4.2'])
+    assert_equal  ['4.10.4'], test_object.lucene_choice(['1.5.0'])
+  end
+
+  def test_es_git_choices
+    test_object = RandomizedRunner.new(RANDOM_CHOICES, '/tmp/dummy/jdk', po = PropertyWriter.new('/tmp'))
+    assert_equal test_object.lucene_choice(['1.4.2']).first, '4.10.2'
+    current_directory =  File.dirname(File.expand_path(__FILE__))
+    test_config = YAML.load_file(File.join(current_directory, 'test', 'shield_randomization_yaml'))
+    test_config = configuration_transformation(test_config)
+    assert_equal  ['tags/v1.5.0'], test_object.es_git_choice(['1.5.0'], test_config)
+    assert_equal  ['tags/v1.4.2'], test_object.es_git_choice(['1.4.2'], test_config)
+    assert_equal  ['origin/1.4'], test_object.es_git_choice(['1.4.2-SNAPSHOT'], test_config)
+    assert_equal  ['tags/v1.4.2'], test_object.es_git_choice(['1.4.2'])
+    assert_equal  ['tags/v1.5.0'], test_object.es_git_choice(['1.5.0'])
+  end
 end
