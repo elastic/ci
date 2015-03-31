@@ -62,7 +62,7 @@
     <com.cloudbees.jenkins.GitHubPushTrigger plugin="github@1.9.1">
       <spec/>
     </com.cloudbees.jenkins.GitHubPushTrigger>
-    <hudson.triggers.TimerTrigger><spec>H/6 * * * *</spec></hudson.triggers.TimerTrigger>
+    <hudson.triggers.TimerTrigger><spec>H */6 * * *</spec></hudson.triggers.TimerTrigger>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
   <builders>
