@@ -12,8 +12,16 @@ $enhancers = [
  'git',
  'ruby',
  'curl',
+ 'wget',
+ 'screen',
 ]
+
 package { $enhancers: }
+
+package {'log4r':
+    ensure     => 'installed',
+      provider => 'gem',
+}
 
 # make sure jenkins user exists 
 $jenkins_dirs = [ "/home/jenkins", "/mnt/jenkins"]
