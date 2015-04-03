@@ -30,6 +30,8 @@ es_args = [
            'es.logger.level=INFO',
            'es.node.bench=true',
            'es.script.disable_dynamic=false',
+           'es.script.inline=on', 
+           'es.script.indexed=on',
            'es.bootstrap.mlockall=true'
           ].map do |line|
   '-D%s' % line
