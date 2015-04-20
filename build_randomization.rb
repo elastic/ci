@@ -292,6 +292,10 @@ class RandomizedRunner
       end
     end
     j = JDKSelector.generate_jdk_hash(jdk_selection)
+    if(j[:JAVA_HOME].include?('JDKEA9'))
+       puts 'force sec manager to be off for JDKEA9'
+       s['test.security.manager'] = false
+    end
 
     # create build description line
     desc = {}
