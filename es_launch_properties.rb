@@ -29,11 +29,17 @@ es_args = [
            'es.discovery.zen.ping.multicast.enabled=false',
            'es.logger.level=INFO',
            'es.node.bench=true',
-           'es.script.disable_dynamic=false',
-           'es.script.inline=on', 
-           'es.script.indexed=on',
            'es.bootstrap.mlockall=true'
-          ].map do |line|
+          ]
+es_branch = ENV['ES_GIT_BRANCH'] || ENV['ES_V'] || 'origin/master'
+
+if(['1.x','master'].any? {|x| es_branch.include?(x) } )
+  es_args += ['es.script.inline=on', 'es.script.indexed=on']
+else
+  es_args.push('es.script.disable_dynamic=false')
+end
+
+es_args = es_args.map do |line|
   '-D%s' % line
 end
 
