@@ -10,7 +10,7 @@
         <es.action.wait_on_mapping_change>true</es.action.wait_on_mapping_change>
         <es.logger.level>DEBUG</es.logger.level>
         <tests.rest.blacklist>cat.recovery/10_basic/*</tests.rest.blacklist>
-        <tests.slow>false</tests.slow>
+        <tests.slow>true</tests.slow>
       </properties>
     </profile>
   </profiles>

@@ -12,7 +12,7 @@
         <es.logger.level>INFO</es.logger.level>
         <es.node.local>true</es.node.local>
         <tests.rest.blacklist>cat.recovery/10_basic/*</tests.rest.blacklist>
-        <tests.slow>false</tests.slow>
+        <tests.slow>true</tests.slow>
         <validate.skip>true</validate.skip>
       </properties>
     </profile>
