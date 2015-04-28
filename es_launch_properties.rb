@@ -34,7 +34,7 @@ es_args = [
 es_branch = ENV['ES_GIT_BRANCH'] || ENV['ES_V'] || 'origin/master'
 
 if(['1.x','master'].any? {|x| es_branch.include?(x) } )
-  es_args += ['es.script.inline=on', 'es.script.indexed=on']
+  es_args += ['es.script.inline=on', 'es.script.indexed=on', 'es.security.manager.enabled=false']
 else
   es_args.push('es.script.disable_dynamic=false')
 end
