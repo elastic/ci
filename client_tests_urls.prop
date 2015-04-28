@@ -26,4 +26,4 @@ URL_12=http://s3-eu-west-1.amazonaws.com/build-eu.elasticsearch.org/origin/1.2/n
 URL_11=http://s3-eu-west-1.amazonaws.com/build-eu.elasticsearch.org/origin/1.1/nightly/JDK7/elasticsearch-latest-SNAPSHOT.zip
 URL_10=http://s3-us-west-2.amazonaws.com/build.elasticsearch.org/origin/1.0/nightly/JDK6/elasticsearch-latest-SNAPSHOT.zip
 URL_090=http://s3-us-west-2.amazonaws.com/build.elasticsearch.org/origin/0.90/nightly/JDK6/elasticsearch-latest-SNAPSHOT.zip
-URL_TAGS=http://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-%s.zip
+URL_TAGS=http://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-%s.zip
