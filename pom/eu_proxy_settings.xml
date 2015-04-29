@@ -1,0 +1,12 @@
+<settings>
+  <proxies>
+    <proxy>
+      <id>squid-eu.ci</id>
+      <active>true</active>
+      <protocol>http</protocol>
+      <host>squid-eu.ci.elastic.co</host>
+      <port>3128</port>
+    </proxy>
+  </proxies>
+</settings>
+
