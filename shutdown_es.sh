@@ -16,5 +16,5 @@
 # language governing permissions and limitations under the License
 #
 echo "Shutting down ES cluster"
-curl -s -XPOST $ES_TEST_HOST'/_shutdown'
+fuser -k -TERM -n tcp $ES_PORT
 exit 0
