@@ -7,7 +7,8 @@ echo "Checking for marvel plugin in nodes info"
 curl "http://localhost:$es_port/_nodes?plugin=true&pretty" | grep -n marvel
 result1=$?
 echo "Shutting down cluster and removing install directory"
-curl -XPOST -s 'http://localhost:'$es_port'/_shutdown'
+fuser -k -TERM -n tcp $es_port
+
 tmpdir=$WORKSPACE/tmp/es-*
 cd $tmpdir/elasticsearch-*
 cd logs

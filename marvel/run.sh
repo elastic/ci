@@ -1,7 +1,8 @@
 #!/bin/bash
 es_port=`expr 9240 + $EXECUTOR_NUMBER`
 echo "Shutting down existing running cluster $es_port"
-curl -s -XPOST 'http://localhost:'$es_port'/_shutdown'
+fuser -k -TERM -n tcp $es_port
+
 
 function quiet {
     OUT=$($* 2>&1)
