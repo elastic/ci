@@ -1,0 +1,6 @@
+cloud:
+  gce:
+      project_id: es-cloud
+      zone: europe-west1-a
+discovery:
+      type: gce
