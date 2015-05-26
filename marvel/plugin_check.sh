@@ -4,7 +4,7 @@ es_port=`expr 9240 + $EXECUTOR_NUMBER`
 #echo `curl "http://localhost:$es_port/_nodes?plugin=true&pretty"`
 # check for each plugin
 echo "Checking for marvel plugin in nodes info"
-curl "http://localhost:$es_port/_nodes?plugin=true&pretty" | grep -n marvel
+curl --ipv4 "http://localhost:$es_port/_nodes?plugin=true&pretty" | grep -n marvel
 result1=$?
 echo "Shutting down cluster and removing install directory"
 fuser -k -TERM -n tcp $es_port
