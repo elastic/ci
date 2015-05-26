@@ -32,6 +32,7 @@
       <properties>
         <es.plugin.port>${env.ES_PLUGIN_PORT}</es.plugin.port>
         <tests.plugin>true</tests.plugin>
+        <license.generation>true</license.generation>
         <sun.zip.disableMemoryMapping>true</sun.zip.disableMemoryMapping>
       </properties>
     </profile>
