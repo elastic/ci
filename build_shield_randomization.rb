@@ -419,7 +419,7 @@ unless(C[:test])
           #TODO: better logic
           L.debug("Window Mode")
           if(File.directory?('y:\jdk7\7u55'))   #old window system under ec2
-             FixedJDKSelector.new(['y:\jdk7\7u55', 'y:\jdk8\8u11'])
+             FixedJDKSelector.new(['y:\jdk7\7u55', 'y:\jdk8\8u40'])
           else  #new metal window system
              FixedJDKSelector.new(['c:\PROGRA~1\JAVA\jdk1.8.0_60', 'c:\PROGRA~1\Zulu\zulu-8'])
           end
