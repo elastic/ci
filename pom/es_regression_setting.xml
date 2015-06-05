@@ -8,8 +8,8 @@
       <properties>
         <tests.network>true</tests.network>
         <es.action.wait_on_mapping_change>true</es.action.wait_on_mapping_change>
-        <es.logger.level>DEBUG</es.logger.level>
         <tests.rest.blacklist>cat.recovery/10_basic/*</tests.rest.blacklist>
+        <elasticsearch.thirdparty.config>shaded</elasticsearch.thirdparty.config>
         <tests.slow>true</tests.slow>
       </properties>
     </profile>
