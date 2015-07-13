@@ -61,7 +61,7 @@ RANDOM_CHOICES = {
   'tests.nightly' => {:selections => false},
   'tests.heap.size' => {:choices => [512, 1024], :method => :random_heap},
   'tests.assertion.disabled'=> {:choices => 'org.elasticsearch', :method => 'get_10_percent'},
-  'tests.security.manager' => {:choices => [true, false], :method => 'get_90_percent'},
+  # 'tests.security.manager' => {:choices => [true, false], :method => 'get_90_percent'}, disable
 }
 
 L = Logger.new 'test_randomizer'
@@ -301,14 +301,14 @@ class RandomizedRunner
     desc = {}
 
     # TODO: better error handling
-    desc[:BUILD_DESC] = "%s,%s,heap[%s],%s%s%s%s" % [
+    desc[:BUILD_DESC] = "%s,%s,heap[%s],%s%s%s" % [
                                             File.basename(j[:JAVA_HOME]),
                                             s['es.node.mode'],
                                             s['tests.heap.size'],
                                             s['tests.nightly'] ? 'nightly,':'',
                                             s['tests.jvm.argline'].gsub(/-XX:/,''),
                                             s.has_key?('tests.assertion.disabled')? ',assert off' : '',
-                                            s['tests.security.manager'] ? ',sec manager on' : ''
+ #                                           s['tests.security.manager'] ? ',sec manager on' : ''
                                            ]
     result = j.merge(s).merge(desc)
     L.debug(YAML.dump(result))
