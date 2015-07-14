@@ -14,6 +14,7 @@
         <tests.heap.size>${env.tests.heap.size}</tests.heap.size>
         <tests.network>true</tests.network>
         <tests.rest.blacklist>cat.recovery/10_basic/*</tests.rest.blacklist>
+        <tests.security.manager>${env.tests.security.manager}</tests.security.manager>
         <tests.slow>true</tests.slow>
         <validate.skip>true</validate.skip>
       </properties>
