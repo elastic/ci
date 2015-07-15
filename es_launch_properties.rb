@@ -35,7 +35,7 @@ es_branch = ENV['ES_GIT_BRANCH'] || ENV['ES_V'] || 'origin/master'
 property_file_directory = ENV['WORKSPACE'] || Dir.pwd
 
 if(['1.x','master', '1.6'].any? {|x| es_branch.include?(x) } )
-  es_args += ['es.script.inline=on', 'es.script.indexed=on', 'es.security.manager.enabled=false', 'es.path.repo=%' % property_file_directory]
+  es_args += ['es.script.inline=on', 'es.script.indexed=on', 'es.security.manager.enabled=false']
 else
   es_args.push('es.script.disable_dynamic=false')
 end
@@ -44,6 +44,7 @@ es_args = es_args.map do |line|
   '-D%s' % line
 end
 
+es_args.push('--path.repo /tmp')
 
 test_host = ENV['TESTHOST'] || 'localhost'
 mytmpdir='tmp%i' % rand(1000)
