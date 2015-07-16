@@ -44,7 +44,7 @@ es_args = es_args.map do |line|
   '-D%s' % line
 end
 
-es_args.push('--path.repo /tmp')
+es_args = es_args + ['--path.repo /tmp', "--repositories.url.allowed_urls 'http://snapshot.*'"]
 
 test_host = ENV['TESTHOST'] || 'localhost'
 mytmpdir='tmp%i' % rand(1000)
