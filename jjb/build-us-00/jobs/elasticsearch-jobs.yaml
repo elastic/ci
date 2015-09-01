@@ -1,0 +1,11 @@
+- project:
+    name: elasticsearch
+    jobs:
+      - 'es_server_{branch}_regression'
+      - 'es_server_{branch}_smoke'
+
+- job-template:
+    name: 'es_server_{branch}_regression'
+
+- job-template:
+    name: 'es_server_{branch}_smoke'

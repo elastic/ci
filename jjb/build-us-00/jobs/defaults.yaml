@@ -1,0 +1,41 @@
+- defaults:
+    name: global
+    github_userid: '38e7e04c-f182-487e-9d84-46b537d5a6bb'
+    github_url: 'https://github.com/elastic'
+    github_scm: 'git@github.com:elastic'
+    squid_proxy: 'http://squid-eu.ci.elastic.co:3128'
+    description: |
+        <p><b>This job is managed by Jenkins Job Builder and will be overwritten.</b></p>
+        <p><b>Do not edit this job through the web interface.</b></p>
+    wrappers:
+      - build-timeout:
+          timeout: 60
+    publishers:
+      - logstash:
+          max-lines: 10000
+      - workspace-cleanup
+    logrotate:
+        daysToKeep: 60
+        numToKeep: -1
+        artifactDaysToKeep: -1
+        artifactNumToKeep: -1
+    branch:
+      - main
+      - 2.0
+    es_branch:
+      - main:
+          smoke: true
+          regression: true
+          random: true
+      - 2.0:
+          smoke: true
+          regression: true
+          random: true  
+    es_versions_1x:
+    es_versions_master:
+    puppet_versions_3x:
+    puppet_versions_4x:
+    puppet_versions_ent:
+    jruby_version:
+    jdk_versions:
+
