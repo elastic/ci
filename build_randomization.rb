@@ -67,7 +67,7 @@ RANDOM_CHOICES = {
 L = Logger.new 'test_randomizer'
 L.outputters = Outputter.stdout
 L.level = INFO
-C = {:local => false, :test => false}
+C = {:local => false, :test => false, :floor => 6}
 
 
 OptionParser.new do |opts|
@@ -83,6 +83,10 @@ OptionParser.new do |opts|
 
   opts.on("-t", "--test", "Run unit tests") do |t|
     C[:test] = true
+  end
+
+  opts.on("-f", "--floor N", Integer, "Minium java version") do |version|
+    C[:floor] = version
   end
 end.parse!
 
@@ -160,13 +164,13 @@ class JDKSelector
     self
   end
 
-  def filter_java_6(files)
-    files.select{ |i| File.basename(i).split(/[^0-9]/)[-1].to_i > 6 }
+  def filter_java_floor(files)
+    files.select{ |i| File.basename(i).split(/[^0-9]/)[-1].to_i >  C[:floor] }
   end
 
   # do randomized selection from a given array
   def select_one(selection_array = nil)
-    selection_array = filter_java_6(selection_array || @jdk_list)
+    selection_array = filter_java_floor(selection_array || @jdk_list)
     Randomizer.new(selection_array).get_random_one
   end
 
@@ -339,6 +343,10 @@ unless(C[:test])
       L.info "properties are written to file prop.txt"
       FileUtils.mkpath "%sJDK6" % test_directory
       FileUtils.mkpath "%sJDK7" % test_directory
+      FileUtils.mkpath "%sJDK8" % test_directory
+      FileUtils.mkpath "%sJDKEA8" % test_directory
+      FileUtils.mkpath "%sJDKEA9" % test_directory
+      FileUtils.mkpath "%sJDKEO7" % test_directory
     end
     working_directory = Dir.pwd
   end
