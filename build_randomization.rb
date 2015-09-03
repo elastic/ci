@@ -67,7 +67,7 @@ RANDOM_CHOICES = {
 L = Logger.new 'test_randomizer'
 L.outputters = Outputter.stdout
 L.level = INFO
-C = {:local => false, :test => false, :floor => 6}
+C = {:local => false, :test => false, :floor => 7}
 
 
 OptionParser.new do |opts|
@@ -165,7 +165,7 @@ class JDKSelector
   end
 
   def filter_java_floor(files)
-    files.select{ |i| File.basename(i).split(/[^0-9]/)[-1].to_i >  C[:floor] }
+    files.select{ |i| File.basename(i).split(/[^0-9]/)[-1].to_i >= C[:floor] }
   end
 
   # do randomized selection from a given array
