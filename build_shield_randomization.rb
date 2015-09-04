@@ -204,7 +204,7 @@ class FixedJDKSelector < JDKSelector
 
   def select_one(selection_array = nil)
     #bypass filtering since this is not automatic
-    selection_array || @jdk_list
+    selection_array ||= @jdk_list
     Randomizer.new(selection_array).get_random_one
   end
 end
