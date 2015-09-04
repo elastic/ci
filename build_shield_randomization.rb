@@ -64,7 +64,7 @@ RANDOM_CHOICES = {
 L = Logger.new 'test_randomizer'
 L.outputters = Outputter.stdout
 L.level = INFO
-C = {:local => false, :test => false}
+C = {:local => false, :test => false, :floor => 7}
 
 
 OptionParser.new do |opts|
