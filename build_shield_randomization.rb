@@ -85,6 +85,10 @@ OptionParser.new do |opts|
   opts.on("-t", "--test", "Run unit tests") do |t|
     C[:test] = true
   end
+
+  opts.on("-f", "--floor N", Integer, "Minium java version") do |version|
+    C[:floor] = version
+  end
 end.parse!
 
 class Randomizer
@@ -161,13 +165,13 @@ class JDKSelector
     self
   end
 
-  def filter_java_6(files)
-    files.select{ |i| File.basename(i).split(/[^0-9]/)[-1].to_i > 6 }
+  def filter_java_floor(files)
+    files.select{ |i| File.basename(i).split(/[^0-9]/)[-1].to_i >= C[:floor] }
   end
 
   # do randomized selection from a given array
   def select_one(selection_array = nil)
-    selection_array = filter_java_6(selection_array || @jdk_list)
+    selection_array = filter_java_floor(selection_array || @jdk_list)
     Randomizer.new(selection_array).get_random_one
   end
 
@@ -200,7 +204,7 @@ class FixedJDKSelector < JDKSelector
 
   def select_one(selection_array = nil)
     #bypass filtering since this is not automatic
-    selection_array ||= @jdk_list
+    selection_array || @jdk_list
     Randomizer.new(selection_array).get_random_one
   end
 end
@@ -400,8 +404,9 @@ unless(C[:test])
     unless(File.exist?(test_directory))
       L.info "running local mode, setting up running environment"
       L.info "properties are written to file prop.txt"
-      FileUtils.mkpath "%sJDK6" % test_directory
-      FileUtils.mkpath "%sJDK7" % test_directory
+      ['6', '7', '8', 'EA8', 'EA9', 'O7'].each do|x|
+        FileUtils.mkpath "%sJDK%s" % [test_directory, x]
+      end
     end
     working_directory = Dir.pwd
   end
