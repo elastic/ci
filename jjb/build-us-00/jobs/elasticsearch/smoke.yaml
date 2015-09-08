@@ -1,0 +1,60 @@
+- defaults:
+    name: elasticsearch
+    description: 'Do not edit this job through the web!'
+    github_url: 'https://github.com/elastic'
+    hipchat:
+      enabled: true
+      rooms:
+        - 'dev-builds'
+      notify-start: false
+      notify-success: true
+      notify-failure: true
+    jdk: 'JDK8'
+    logrotate:
+      daysToKeep: 20
+      numToKeep: -1
+      artifactDaysToKeep: -1
+      artifactNumToKeep: -1
+    smoke: 'smoke'
+
+- project:
+    name: elasticsearch
+    branch: master
+    jobs:
+      - '{name}-{branch}-{smoke}'
+
+- job-template:
+    name: '{name}-{branch}-{smoke}'
+    builders:
+      - shell:
+          !include-raw-escape 'load-properties.sh'
+      - shell:
+          !include-raw-escape '../../common/scripts/kill_es.sh'
+      - inject:
+          properties-file: 'es_prop.txt'
+      - maven-target:
+          maven-version: 'mvn standard'
+          goals: 'clean package'
+          properties:
+            - skipTests=true
+          global-settings: '${{HOME}}/proxy.xml'
+    defaults: elasticsearch
+    display-name: '{name} {branch} {smoke}'
+    node: '{name}-{smoke}'
+    project-type: freestyle
+    properties:
+      - github:
+          url: '{github_url}/{name}'
+    roam: false
+    scm:
+      - git:
+          clean:
+            after: true
+          prune: true
+          branches:
+            - 'origin/{branch}'
+          skip-tag: true
+          submodule:
+            disable: true
+          wipe-workspace: false
+          url: '{github_url}/{name}.git'
