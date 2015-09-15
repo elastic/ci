@@ -1,6 +1,9 @@
 - defaults:
     name: elasticsearch
     description: 'Do not edit this job through the web!'
+    ci-script-includes: 'master/ci/**/*'
+    es-property-file: 'es_prop.txt'
+    email-recipients: 'dev@elatic.co'
     github_url: 'https://github.com/elastic'
     hipchat:
       enabled: true
@@ -21,7 +24,8 @@
     name: elasticsearch
     branch: master
     jobs:
-      - '{name}-{branch}-{smoke}'
+      - '{name}-{branch}-{smoke}':
+          ci-debug: true
 
 - job-template:
     name: '{name}-{branch}-{smoke}'
@@ -31,7 +35,7 @@
       - shell:
           !include-raw-escape '../../common/scripts/kill_es.sh'
       - inject:
-          properties-file: 'es_prop.txt'
+          properties-file: '{es-property-file}'
       - maven-target:
           maven-version: 'mvn standard'
           goals: 'clean package'
@@ -41,6 +45,33 @@
     defaults: elasticsearch
     display-name: '{name} {branch} {smoke}'
     node: '{name}-{smoke}'
+    publishers:
+      - archive:
+          artifacts: 'log/*'
+          allow-empty: true
+          latest-only: false
+          only-if-success: false
+      - description-setter:
+          description: $GIT_BRANCH
+          description-for-failed: $GIT_BRANCH
+      - email-ext:
+          content-type: both-html-text
+          recipients: '{email-recipients}'
+          subject: $DEFAULT_SUBJECT
+          body: ${{SCRIPT, template=&quot;randomization.template&quot;}}
+      - post-tasks:
+          - matches:
+              - log-text: 'on'
+                operator: AND
+            script: bash -x master/ci/shutdown_es.sh
+      - workspace-cleanup:
+          dirmatch: true
+          fail-build: false
+          include:
+            - 'target'
+            - 'tmp'
+            - '**/ci'
+
     project-type: freestyle
     properties:
       - github:
@@ -58,3 +89,12 @@
             disable: true
           wipe-workspace: false
           url: '{github_url}/{name}.git'
+    wrappers:
+      - copy-to-slave:
+          includes:
+            - '{ci-script-includes}'
+          flatten: false
+          relative-to: userContent
+          include-ant-excludes: false
+      - inject:
+          properties-content: 'CI_DEBUG={ci-debug}'

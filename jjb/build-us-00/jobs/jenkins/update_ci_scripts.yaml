@@ -1,0 +1,55 @@
+- defaults:
+    name: jenkins
+    description: 'Do not edit this job through the web!'
+    ci-script-includes: 'master/ci/**/*'
+    es-property-file: 'es_prop.txt'
+    email-recipients: 'dev@elatic.co'
+    github_url: 'https://github.com/elastic'
+    hipchat:
+      enabled: true
+      rooms:
+        - 'infra'
+      notify-start: false
+      notify-success: true
+      notify-failure: true
+    jdk: 'JDK8'
+    logrotate:
+      daysToKeep: 7
+      numToKeep: -1
+      artifactDaysToKeep: -1
+      artifactNumToKeep: -1
+    smoke: 'smoke'
+
+- project:
+    name: ci
+    branch: master
+    jobs:
+      - '{name}-{branch}-scriptupdate':
+          ci-debug: true
+
+- job-template:
+    name: '{name}-{branch}-scriptupdate'
+    builders:
+      - shell:
+          !include-raw-escape 'ci-update.sh'
+    defaults: jenkins
+    display-name: '{name} {branch} scriptupdate'
+    node: master
+
+    project-type: freestyle
+    properties:
+      - github:
+          url: '{github_url}/{name}'
+    roam: false
+    scm:
+      - git:
+          clean:
+            after: true
+          prune: true
+          branches:
+            - 'origin/{branch}'
+          skip-tag: true
+          submodule:
+            disable: true
+          wipe-workspace: true
+          url: '{github_url}/{name}.git'
