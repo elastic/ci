@@ -61,6 +61,7 @@ RANDOM_CHOICES = {
   'tests.nightly' => {:selections => false},
   'tests.heap.size' => {:choices => [512, 1024], :method => :random_heap},
   'tests.assertion.disabled'=> {:choices => 'org.elasticsearch', :method => 'get_10_percent'},
+  'tests.network' => {:choices => [true, false], :method => 'get_10_percent'},
   # 'tests.security.manager' => {:choices => [true, false], :method => 'get_90_percent'}, disable
 }
 
@@ -283,6 +284,20 @@ class RandomizedRunner
     generated
   end
 
+  def generate_gradle_options(selections)
+    selections.map do |k, v|
+      if(k.start_with?("tests"))
+        if(v.to_s.include?(' '))
+          "-D%s='%s'" % [k, v]
+        else
+          "-D%s=%s" % [k, v]
+        end
+      else
+        nil
+      end
+    end.push('-Des.logger.level=DEBUG').compact.join(' ')
+  end
+
   def get_env_matrix(jdk_selection, selections)
     L.debug "Enter %s" % __method__
 
@@ -303,6 +318,10 @@ class RandomizedRunner
 
     # create build description line
     desc = {}
+
+    # gradle options
+    L.debug "i should be generating gradle"
+    desc[:GRADLE_OPTS] = generate_gradle_options(s)
 
     # TODO: better error handling
     desc[:BUILD_DESC] = "%s,%s,heap[%s],%s%s%s" % [
@@ -341,12 +360,9 @@ unless(C[:test])
     unless(File.exist?(test_directory))
       L.info "running local mode, setting up running environment"
       L.info "properties are written to file prop.txt"
-      FileUtils.mkpath "%sJDK6" % test_directory
-      FileUtils.mkpath "%sJDK7" % test_directory
-      FileUtils.mkpath "%sJDK8" % test_directory
-      FileUtils.mkpath "%sJDKEA8" % test_directory
-      FileUtils.mkpath "%sJDKEA9" % test_directory
-      FileUtils.mkpath "%sJDKEO7" % test_directory
+      ['JDK6', 'JDK7', 'JDK8', 'JDKEA8', 'JDKEA9', 'JDKEO7'].each do |x|
+        FileUtils.mkpath "%s%s" % [test_directory, x]
+      end
     end
     working_directory = Dir.pwd
   end
