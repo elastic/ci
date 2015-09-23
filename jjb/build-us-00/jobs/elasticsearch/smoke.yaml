@@ -1,7 +1,7 @@
 - defaults:
     name: elasticsearch
     description: 'Do not edit this job through the web!'
-    ci-script-includes: 'master/ci/**/*'
+    ci-script-includes: 'ci/origin/master/**/*'
     es-property-file: 'es_prop.txt'
     email-recipients: 'dev@elatic.co'
     github_url: 'https://github.com/elastic'
@@ -33,7 +33,7 @@
       - shell:
           !include-raw-escape 'load-properties.sh'
       - shell:
-          !include-raw-escape '../../common/scripts/kill_es.sh'
+          !include-raw-escape 'kill_es.sh'
       - inject:
           properties-file: '{es-property-file}'
       - maven-target:
@@ -41,7 +41,7 @@
           goals: 'clean package'
           properties:
             - skipTests=true
-          global-settings: '${{HOME}}/proxy.xml'
+#          global-settings: '${{HOME}}/proxy.xml'
     defaults: elasticsearch
     display-name: '{name} {branch} {smoke}'
     node: '{name}-{smoke}'
@@ -63,7 +63,7 @@
           - matches:
               - log-text: 'on'
                 operator: AND
-            script: bash -x master/ci/shutdown_es.sh
+            script: bash -x ci/origin/{branch}/shutdown_es.sh
       - workspace-cleanup:
           dirmatch: true
           fail-build: false
