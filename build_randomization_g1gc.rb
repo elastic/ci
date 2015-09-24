@@ -36,7 +36,7 @@
 #
 #       -d, --debug   Increase logging verbosity for debugging purpose
 #       -t, --test    Run in test mode.  The script will execute unit tests.
-#       -l, --local   Run in local mode.  In this mode, directory structure will be created under current directory to mimick
+#       -l, --local   Run in local mode.  In this mode, directory structure will be created under current directory to mimick 
 #                     Jenkins' server directory layout. This mode is mainly used for development.
 require 'rubygems'
 
@@ -50,7 +50,7 @@ include Log4r
 RANDOM_CHOICES = {
   'tests.jvm.argline' => [
                 {:choices => ['-server'], :method => 'get_random_one'},
-                {:choices => ['-XX:+UseConcMarkSweepGC', '-XX:+UseParallelGC', '-XX:+UseSerialGC', '-XX:+UseG1GC'], :method => 'get_random_one'},
+                {:choices => ['-XX:+UseG1GC'], :method => 'get_random_one'},
                 {:choices => ['-XX:+UseCompressedOops', '-XX:-UseCompressedOops'], :method => 'get_random_one'},
                 {:choices => ['-XX:+AggressiveOpts'], :method => 'get_50_percent'}
                ],
@@ -61,14 +61,13 @@ RANDOM_CHOICES = {
   'tests.nightly' => {:selections => false},
   'tests.heap.size' => {:choices => [512, 1024], :method => :random_heap},
   'tests.assertion.disabled'=> {:choices => 'org.elasticsearch', :method => 'get_10_percent'},
-  'tests.network' => {:choices => [true, false], :method => 'get_10_percent'},
-  # 'tests.security.manager' => {:choices => [true, false], :method => 'get_90_percent'}, disable
+#  'tests.security.manager' => {:choices => [true, false], :method => 'get_90_percent'},
 }
 
 L = Logger.new 'test_randomizer'
 L.outputters = Outputter.stdout
 L.level = INFO
-C = {:local => false, :test => false, :floor => 7}
+C = {:local => false, :test => false}
 
 
 OptionParser.new do |opts|
@@ -84,10 +83,6 @@ OptionParser.new do |opts|
 
   opts.on("-t", "--test", "Run unit tests") do |t|
     C[:test] = true
-  end
-
-  opts.on("-f", "--floor N", Integer, "Minium java version") do |version|
-    C[:floor] = version
   end
 end.parse!
 
@@ -165,13 +160,13 @@ class JDKSelector
     self
   end
 
-  def filter_java_floor(files)
-    files.select{ |i| File.basename(i).split(/[^0-9]/)[-1].to_i >= C[:floor] }
+  def filter_java_7(files)
+    files.select{ |i| File.basename(i).split(/[^0-9]/)[-1].to_i > 7 }
   end
 
   # do randomized selection from a given array
   def select_one(selection_array = nil)
-    selection_array = filter_java_floor(selection_array || @jdk_list)
+    selection_array = filter_java_7(selection_array || @jdk_list)
     Randomizer.new(selection_array).get_random_one
   end
 
@@ -284,20 +279,6 @@ class RandomizedRunner
     generated
   end
 
-  def generate_gradle_options(selections)
-    selections.map do |k, v|
-      if(k.start_with?("tests"))
-        if(v.to_s.include?(' '))
-          "-D%s='%s'" % [k, v]
-        else
-          "-D%s=%s" % [k, v]
-        end
-      else
-        nil
-      end
-    end.push('-Des.logger.level=DEBUG').compact.join(' ')
-  end
-
   def get_env_matrix(jdk_selection, selections)
     L.debug "Enter %s" % __method__
 
@@ -314,14 +295,11 @@ class RandomizedRunner
     if(j[:JAVA_HOME].include?('JDKEA9'))
        puts 'force sec manager to be off for JDKEA9'
        s['tests.security.manager'] = false
-    end
+    end 
+
 
     # create build description line
     desc = {}
-
-    # gradle options
-    L.debug "i should be generating gradle"
-    desc[:GRADLE_OPTS] = generate_gradle_options(s)
 
     # TODO: better error handling
     desc[:BUILD_DESC] = "%s,%s,heap[%s],%s%s%s" % [
@@ -331,7 +309,7 @@ class RandomizedRunner
                                             s['tests.nightly'] ? 'nightly,':'',
                                             s['tests.jvm.argline'].gsub(/-XX:/,''),
                                             s.has_key?('tests.assertion.disabled')? ',assert off' : '',
- #                                           s['tests.security.manager'] ? ',sec manager on' : ''
+                                            #s['tests.security.manager'] ? ',sec manager on' : ''
                                            ]
     result = j.merge(s).merge(desc)
     L.debug(YAML.dump(result))
@@ -360,9 +338,8 @@ unless(C[:test])
     unless(File.exist?(test_directory))
       L.info "running local mode, setting up running environment"
       L.info "properties are written to file prop.txt"
-      ['JDK6', 'JDK7', 'JDK8', 'JDKEA8', 'JDKEA9', 'JDKEO7'].each do |x|
-        FileUtils.mkpath "%s%s" % [test_directory, x]
-      end
+      FileUtils.mkpath "%sJDK6" % test_directory
+      FileUtils.mkpath "%sJDK7" % test_directory
     end
     working_directory = Dir.pwd
   end
@@ -375,9 +352,9 @@ unless(C[:test])
           #TODO: better logic
           L.debug("Window Mode")
           if(File.directory?('y:\jdk7\7u55'))   #old window system under ec2
-             FixedJDKSelector.new(['y:\jdk8\8u11'])
+             FixedJDKSelector.new(['y:\jdk7\7u55', 'y:\jdk8\8u11'])
           else  #new metal window system
-             FixedJDKSelector.new(['c:\PROGRA~1\JAVA\jdk1.8.0_40', 'c:\PROGRA~1\Zulu\zulu-8'])
+             FixedJDKSelector.new(['c:\PROGRA~1\JAVA\jdk1.8.0_11', 'c:\PROGRA~1\JAVA\jdk1.7.0_55', 'c:\PROGRA~1\Zulu\zulu-8'])
           end
         else
           #Jenkins sets pwd prior to execution
@@ -472,7 +449,7 @@ end
 
 class DummyPropertyWriter < PropertyWriter
   def generate_property_file(data)
-    L.debug "generating property file for %s" % YAML.dump(data)
+    L.debug "generating property file for %s" % YAML.dump(data) 
     L.debug "on directory %s" % working_directory
   end
 end
@@ -493,7 +470,7 @@ class TestRandomizedRunner < Test::Unit::TestCase
   end
 
   def test_generate_with_method
-    test_object = RandomizedRunner.new({'es.node.mode' => {:choices => ['local', 'network'], :method => 'get_random_one'}},
+    test_object = RandomizedRunner.new({'es.node.mode' => {:choices => ['local', 'network'], :method => 'get_random_one'}}, 
                                       '/tmp/dummy/jdk', po = DummyPropertyWriter.new('/tmp'))
     selection =  test_object.generate_selections
     assert ['local', 'network'].include?(selection['es.node.mode'].first), 'selection choice is not correct'
