@@ -36,7 +36,7 @@
 #
 #       -d, --debug   Increase logging verbosity for debugging purpose
 #       -t, --test    Run in test mode.  The script will execute unit tests.
-#       -l, --local   Run in local mode.  In this mode, directory structure will be created under current directory to mimick 
+#       -l, --local   Run in local mode.  In this mode, directory structure will be created under current directory to mimick
 #                     Jenkins' server directory layout. This mode is mainly used for development.
 require 'rubygems'
 
@@ -472,7 +472,7 @@ end
 
 class DummyPropertyWriter < PropertyWriter
   def generate_property_file(data)
-    L.debug "generating property file for %s" % YAML.dump(data) 
+    L.debug "generating property file for %s" % YAML.dump(data)
     L.debug "on directory %s" % working_directory
   end
 end
@@ -493,7 +493,7 @@ class TestRandomizedRunner < Test::Unit::TestCase
   end
 
   def test_generate_with_method
-    test_object = RandomizedRunner.new({'es.node.mode' => {:choices => ['local', 'network'], :method => 'get_random_one'}}, 
+    test_object = RandomizedRunner.new({'es.node.mode' => {:choices => ['local', 'network'], :method => 'get_random_one'}},
                                       '/tmp/dummy/jdk', po = DummyPropertyWriter.new('/tmp'))
     selection =  test_object.generate_selections
     assert ['local', 'network'].include?(selection['es.node.mode'].first), 'selection choice is not correct'

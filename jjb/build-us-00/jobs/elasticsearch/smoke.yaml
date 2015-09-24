@@ -1,0 +1,100 @@
+- defaults:
+    name: elasticsearch
+    description: 'Do not edit this job through the web!'
+    ci-script-includes: 'ci/origin/master/**/*'
+    es-property-file: 'es_prop.txt'
+    email-recipients: 'dev@elatic.co'
+    github_url: 'https://github.com/elastic'
+    hipchat:
+      enabled: true
+      rooms:
+        - 'dev-builds'
+      notify-start: false
+      notify-success: true
+      notify-failure: true
+    jdk: 'JDK8'
+    logrotate:
+      daysToKeep: 20
+      numToKeep: -1
+      artifactDaysToKeep: -1
+      artifactNumToKeep: -1
+    smoke: 'smoke'
+
+- project:
+    name: elasticsearch
+    branch: master
+    jobs:
+      - '{name}-{branch}-{smoke}':
+          ci-debug: true
+
+- job-template:
+    name: '{name}-{branch}-{smoke}'
+    builders:
+      - shell:
+          !include-raw-escape 'load-properties.sh'
+      - shell:
+          !include-raw-escape 'kill_es.sh'
+      - inject:
+          properties-file: '{es-property-file}'
+      - maven-target:
+          maven-version: 'mvn standard'
+          goals: 'clean package'
+          properties:
+            - skipTests=true
+#          global-settings: '${{HOME}}/proxy.xml'
+    defaults: elasticsearch
+    display-name: '{name} {branch} {smoke}'
+    node: '{name}-{smoke}'
+    publishers:
+      - archive:
+          artifacts: 'log/*'
+          allow-empty: true
+          latest-only: false
+          only-if-success: false
+      - description-setter:
+          description: $GIT_BRANCH
+          description-for-failed: $GIT_BRANCH
+      - email-ext:
+          content-type: both-html-text
+          recipients: '{email-recipients}'
+          subject: $DEFAULT_SUBJECT
+          body: ${{SCRIPT, template=&quot;randomization.template&quot;}}
+      - post-tasks:
+          - matches:
+              - log-text: 'on'
+                operator: AND
+            script: bash -x ci/origin/{branch}/shutdown_es.sh
+      - workspace-cleanup:
+          dirmatch: true
+          fail-build: false
+          include:
+            - 'target'
+            - 'tmp'
+            - '**/ci'
+
+    project-type: freestyle
+    properties:
+      - github:
+          url: '{github_url}/{name}'
+    roam: false
+    scm:
+      - git:
+          clean:
+            after: true
+          prune: true
+          branches:
+            - 'origin/{branch}'
+          skip-tag: true
+          submodule:
+            disable: true
+          wipe-workspace: false
+          url: '{github_url}/{name}.git'
+    wrappers:
+      - copy-to-slave:
+          includes:
+            - '{ci-script-includes}'
+          flatten: false
+          relative-to: userContent
+          include-ant-excludes: false
+      - inject:
+          properties-content: 'CI_DEBUG={ci-debug}'
