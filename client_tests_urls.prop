@@ -17,7 +17,7 @@
 #
 # This is used for client testings to pull in master, 090 bits
 #
-URL_MASTER=http://s3-eu-west-1.amazonaws.com/build.eu-west-1.elastic.co/origin/master/nightly/JDK7/distribution/zip/build/distributions/elasticsearch-3.0.0-SNAPSHOT.zip
+URL_MASTER=http://s3-eu-west-1.amazonaws.com/build.eu-west-1.elastic.co/origin/master/elasticsearch-latest-SNAPSHOT.zip
 URL_2x=http://s3-eu-west-1.amazonaws.com/build.eu-west-1.elastic.co/origin/2.x/nightly/JDK7/elasticsearch-latest-SNAPSHOT.zip
 URL_20=http://s3-eu-west-1.amazonaws.com/build.eu-west-1.elastic.co/origin/2.0/nightly/JDK7/elasticsearch-latest-SNAPSHOT.zip
 URL_1x=http://s3-eu-west-1.amazonaws.com/build-eu.elasticsearch.org/origin/1.x/nightly/JDK7/elasticsearch-latest-SNAPSHOT.zip
