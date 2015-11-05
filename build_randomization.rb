@@ -288,11 +288,7 @@ class RandomizedRunner
     selections.map do |k, v|
       if(k.start_with?("tests"))
         if(v.to_s.include?(' '))
-           if(Gem.win_platform?)
-             "-D%s=\"'%s'\"" % [k, v]
-           else
-             "-D%s='%s'" % [k, v]
-           end
+          '-D%s="%s"' % [k, v]
         else
           "-D%s=%s" % [k, v]
         end
