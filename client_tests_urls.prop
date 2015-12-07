@@ -19,7 +19,7 @@
 #
 URL_MASTER=http://s3-eu-west-1.amazonaws.com/build.eu-west-1.elastic.co/origin/master/elasticsearch-latest-SNAPSHOT.zip
 URL_2x=http://s3-eu-west-1.amazonaws.com/build.eu-west-1.elastic.co/origin/2.x/nightly/JDK7/elasticsearch-latest-SNAPSHOT.zip
-URL_21=http://s3-eu-west-1.amazonaws.com/build-eu.elasticsearch.org/origin/2.1/nightly/JDK7/elasticsearch-latest-SNAPSHOT.zip
+URL_21=http://s3-eu-west-1.amazonaws.com/build.eu-west-1.elastic.co/origin/2.1/nightly/JDK7/elasticsearch-latest-SNAPSHOT.zip
 URL_20=http://s3-eu-west-1.amazonaws.com/build.eu-west-1.elastic.co/origin/2.0/nightly/JDK7/elasticsearch-latest-SNAPSHOT.zip
 URL_1x=http://s3-eu-west-1.amazonaws.com/build-eu.elasticsearch.org/origin/1.x/nightly/JDK7/elasticsearch-latest-SNAPSHOT.zip
 URL_17=http://s3-eu-west-1.amazonaws.com/build.eu-west-1.elastic.co/origin/1.7/nightly/JDK7/elasticsearch-latest-SNAPSHOT.zip
