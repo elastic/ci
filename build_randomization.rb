@@ -375,9 +375,9 @@ unless(C[:test])
           #TODO: better logic
           L.debug("Window Mode")
           if(File.directory?('y:\jdk7\7u55'))   #old window system under ec2
-             FixedJDKSelector.new(['y:\jdk8\8u11'])
+             FixedJDKSelector.new(['y:\jdk8\8u60'])
           else  #new metal window system
-             FixedJDKSelector.new(['c:\PROGRA~1\JAVA\jdk1.8.0_40', 'c:\PROGRA~1\Zulu\zulu-8'])
+             FixedJDKSelector.new(['c:\PROGRA~1\JAVA\jdk1.8.0_60', 'c:\PROGRA~1\Zulu\zulu-8'])
           end
         else
           #Jenkins sets pwd prior to execution
