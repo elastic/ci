@@ -36,7 +36,7 @@
 #
 #       -d, --debug   Increase logging verbosity for debugging purpose
 #       -t, --test    Run in test mode.  The script will execute unit tests.
-#       -l, --local   Run in local mode.  In this mode, directory structure will be created under current directory to mimick 
+#       -l, --local   Run in local mode.  In this mode, directory structure will be created under current directory to mimick
 #                     Jenkins' server directory layout. This mode is mainly used for development.
 require 'rubygems'
 
@@ -295,7 +295,7 @@ class RandomizedRunner
     if(j[:JAVA_HOME].include?('JDKEA9'))
        puts 'force sec manager to be off for JDKEA9'
        s['tests.security.manager'] = false
-    end 
+    end
 
 
     # create build description line
@@ -353,7 +353,11 @@ unless(C[:test])
           L.debug("Window Mode")
           if(File.directory?('c:\PROGRA~1\JAVA'))
             #new metal window system
-            FixedJDKSelector.new(['c:\PROGRA~1\JAVA\jdk1.8.0_60', 'c:\PROGRA~1\JAVA\jdk1.7.0_55', 'c:\PROGRA~1\Zulu\zulu-8'])
+            if(File.directory?('c:\PROGRA~1\Zulu\zulu-8'))
+              FixedJDKSelector.new(['c:\PROGRA~1\JAVA\jdk1.8.0_60', 'c:\PROGRA~1\JAVA\jdk1.7.0_55', 'c:\PROGRA~1\Zulu\zulu-8'])
+            else
+              FixedJDKSelector.new(['c:\PROGRA~1\JAVA\jdk1.8.0_60', 'c:\PROGRA~1\JAVA\jdk1.7.0_55'])
+            end
           else
             #old window system under ec2
             FixedJDKSelector.new(['y:\jdk7\7u55', 'y:\jdk8\8u60'])
@@ -451,7 +455,7 @@ end
 
 class DummyPropertyWriter < PropertyWriter
   def generate_property_file(data)
-    L.debug "generating property file for %s" % YAML.dump(data) 
+    L.debug "generating property file for %s" % YAML.dump(data)
     L.debug "on directory %s" % working_directory
   end
 end
@@ -472,7 +476,7 @@ class TestRandomizedRunner < Test::Unit::TestCase
   end
 
   def test_generate_with_method
-    test_object = RandomizedRunner.new({'es.node.mode' => {:choices => ['local', 'network'], :method => 'get_random_one'}}, 
+    test_object = RandomizedRunner.new({'es.node.mode' => {:choices => ['local', 'network'], :method => 'get_random_one'}},
                                       '/tmp/dummy/jdk', po = DummyPropertyWriter.new('/tmp'))
     selection =  test_object.generate_selections
     assert ['local', 'network'].include?(selection['es.node.mode'].first), 'selection choice is not correct'
