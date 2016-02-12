@@ -353,7 +353,11 @@ unless(C[:test])
           L.debug("Window Mode")
           if(File.directory?('c:\PROGRA~1\JAVA'))
             #new metal window system
-            FixedJDKSelector.new(['c:\PROGRA~1\JAVA\jdk1.8.0_60', 'c:\PROGRA~1\JAVA\jdk1.7.0_55'])
+            if(File.directory?('c:\PROGRA~1\Zulu\zulu-8'))
+              FixedJDKSelector.new(['c:\PROGRA~1\JAVA\jdk1.8.0_60', 'c:\PROGRA~1\JAVA\jdk1.7.0_55', 'c:\PROGRA~1\Zulu\zulu-8'])
+            else
+              FixedJDKSelector.new(['c:\PROGRA~1\JAVA\jdk1.8.0_60', 'c:\PROGRA~1\JAVA\jdk1.7.0_55'])
+            end
           else
             #old window system under ec2
             FixedJDKSelector.new(['y:\jdk7\7u55', 'y:\jdk8\8u60'])
