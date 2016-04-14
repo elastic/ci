@@ -50,7 +50,7 @@ include Log4r
 RANDOM_CHOICES = {
   'tests.jvm.argline' => [
                 {:choices => ['-server'], :method => 'get_random_one'},
-                {:choices => ['-XX:+UseConcMarkSweepGC', '-XX:+UseParallelGC', '-XX:+UseSerialGC', '-XX:+UseG1GC'], :method => 'get_random_one'},
+                {:choices => ['-XX:+UseConcMarkSweepGC'], :method => 'get_random_one'},
                 {:choices => ['-XX:+UseCompressedOops', '-XX:-UseCompressedOops'], :method => 'get_random_one'},
                 {:choices => ['-XX:+AggressiveOpts'], :method => 'get_50_percent'}
                ],
