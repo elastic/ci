@@ -285,7 +285,7 @@ class RandomizedRunner
   end
 
   def generate_gradle_options(selections)
-    selections.map do |k, v|
+    gradleparams = selections.map do |k, v|
       if(k.start_with?("tests"))
         if(v.to_s.include?(' '))
           '-D%s="%s"' % [k, v]
@@ -295,7 +295,13 @@ class RandomizedRunner
       else
         nil
       end
-    end.push(ENV['JOB_NAME'].include?('es_core_master_windows') ? '-Dtests.logger.level=DEBUG' : '-Des.logger.level=DEBUG')
+    end
+    if(ENV['JOB_NAME'].include?('es_core_master_windows'))
+        gradleparams.push('-Dtests.logger.level=DEBUG')
+    else
+        gradleparams.push('-Des.logger.level=DEBUG')
+    end
+    return gradleparams.compact.join(' ')
   end
 
   def get_env_matrix(jdk_selection, selections)
