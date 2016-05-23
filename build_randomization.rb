@@ -295,7 +295,7 @@ class RandomizedRunner
       else
         nil
       end
-    end.push('-Des.logger.level=DEBUG').compact.join(' ')
+    end.push(ENV['JOB_NAME'].include?('es_core_master_windows') ? '-Dtests.logger.level=DEBUG' : '-Des.logger.level=DEBUG')
   end
 
   def get_env_matrix(jdk_selection, selections)
