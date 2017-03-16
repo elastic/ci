@@ -296,11 +296,6 @@ class RandomizedRunner
         nil
       end
     end
-    if(ENV['JOB_NAME'].include?('es_core_master_window'))
-        gradleparams.push('-Dtests.es.logger.level=DEBUG')
-    else
-        gradleparams.push('-Des.logger.level=DEBUG')
-    end
     return gradleparams.compact.join(' ')
   end
 
