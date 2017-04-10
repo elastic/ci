@@ -378,13 +378,13 @@ unless(C[:test])
           if(File.directory?('c:\PROGRA~1\JAVA'))
             #new metal window system
             if(File.directory?('c:\PROGRA~1\Zulu\zulu-8'))
-              FixedJDKSelector.new(['c:\PROGRA~1\JAVA\jdk1.8.0_60', 'c:\PROGRA~1\Zulu\zulu-8'])
+              FixedJDKSelector.new(['c:\PROGRA~1\JAVA\jdk1.8.0_121', 'c:\PROGRA~1\Zulu\zulu-8'])
             else
-              FixedJDKSelector.new(['c:\PROGRA~1\JAVA\jdk1.8.0_60'])
+              FixedJDKSelector.new(['c:\PROGRA~1\JAVA\jdk1.8.0_121'])
             end
           else
             #old window system under ec2
-            FixedJDKSelector.new(['y:\jdk8\8u60'])
+            FixedJDKSelector.new(['y:\jdk8\8u121'])
           end
         else
           #Jenkins sets pwd prior to execution
